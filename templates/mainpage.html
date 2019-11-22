@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>A</title>
+</head>
+<body>
+{% if withResult %}
+    <div>
+    {{ result }}
+    You need to {{ f_res }}
+    <form action="feedback" method="post">
+        {% csrf_token %}
+        <input hidden value="{{ id }}" name="id"/>
+        <select name="is_good">
+            <option value="good">Good</option>
+            <option value="">Bad</option>
+        </select>
+        <input type="submit"/>
+    </form>
+    Form for Feedback
+    </div>
+{% endif %}
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="text" name="text"/>
+    <input type="submit"/>
+</form>
+</body>
+</html>

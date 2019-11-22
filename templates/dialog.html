@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dialog-Test</title>
+</head>
+<script>
+    const handleClick = async () =>{
+        const sendData = {"dialog_id":{{ dialog_id }}, "text": document.getElementById('text_area_for_send').value};
+        document.getElementById("text_area_for_send").innerHTML = "A";
+        console.log(sendData)
+        let data = {}
+        await fetch("http://127.0.0.1:8020/dialog",{
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                data: JSON.stringify(sendData)})
+            .then(res => res.json())
+            .then(res => data = res)
+        document.getElementById('text_area_for_send').innerHTML = ""
+        document.getElementById('text_area_for_send').innerText = ""
+        document.getElementById("history").innerText += `${data.foo}`
+    }
+</script>
+<body>
+    <div>
+        <textarea  id="history">How can i help you?</textarea>
+    </div>
+    <textarea id="text_area_for_send"></textarea>
+    <input type="submit" onclick="handleClick()">
+</body>
+</html>
