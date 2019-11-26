@@ -25,5 +25,6 @@ data = [
     "mood",
     "temperature",
     "backache",
-    "fever"
+    "fever",
+    "pain in the neck"
 ]

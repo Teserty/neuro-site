@@ -24,10 +24,17 @@
     }
 </script>
 <body>
-    <div>
-        <textarea  id="history">How can i help you?</textarea>
+    <!--div>
+        <textarea  name="history">How can i help you?</textarea>
     </div>
-    <textarea id="text_area_for_send"></textarea>
-    <input type="submit" onclick="handleClick()">
+    <textarea name="text_area_for_send"></textarea>
+    <input type="submit" onclick="handleClick()"-->
+    <div>{{ neuro_text }}</div>
+    <form action="/dialog" method="post">
+        {% csrf_token %}
+        <input name="id" hidden value={{ id }}>
+        <input type="text" name="text">
+        <input type="submit">
+    </form>
 </body>
 </html>

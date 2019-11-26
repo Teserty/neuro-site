@@ -52,54 +52,67 @@ import json
 # 3 - пользователь согласился с нами
 # 4 - пользователь получил наш ответ и оценивает его
 
-@csrf_exempt
+
 def dialog(request):
     if request.method == "POST":
-        json_data = json.loads(request.body)
-        print(json_data)
-        dialog = NewDialog.objects.get(id=request.POST.get("dialog_id"))
+        #print(request.POST.get("id"))
+        dialog = NewDialog.objects.get(id=request.POST.get("id"))
         if(dialog.stage == 0):
 
             array = work_with_text(request.POST.get("text"))
             array = convert_to_vector(array)
 
             dialog.user_text += "\n" + request.POST.get("text")
-            dialog.our_text += "\n" + array
+            mystring = ""
+            for digit in array:
+                mystring += str(digit)
+            dialog.our_text += "\n" + mystring
             dialog.result = array
             dialog.stage = 1
             dialog.save()
-            return JsonResponse({'array': array})
+            return render(request, "dialog.html", {"neuro_text": array, "id": dialog.id})
         if(dialog.stage == 1):
             if(request.POST.get("text") == ("Y" or "Yes" or "yes")):
                 dialog.stage = 3
+
+                result = "Wait"
                 #dialog.result
                 dialog.save()
-                return JsonResponse({"neuro": "sf"})
+                #return render(request, "dialog.html", {"neuro_text": result, "id": dialog.id})
             else:
                 dialog.stage = 2
-                return JsonResponse({"wait": "wait"})
+                text = "Send again"
+                dialog.save()
+                return render(request, "dialog.html", {"neuro_text": text, "id": dialog.id})
         if(dialog.stage == 2):
             array = convert_to_vector(request.POST.get("text"))
 
             dialog.user_text += "\n" + request.POST.get("text")
-            dialog.our_text += "\n" + array
+            mystring = ""
+            for digit in array:
+                mystring += " "+ str(digit)
+            dialog.our_text += "\n" + mystring
             dialog.result = array
             dialog.stage = 3
             dialog.save()
 
-            return JsonResponse({'array': array})
+            return render(request, "dialog.html", {"neuro_text": mystring, "id": dialog.id})
         if(dialog.stage == 3):
             #neuro
             f_res = get_data(dialog.result)
-            return JsonResponse({"res":f_res})
+            dialog.stage = 4
+            dialog.save()
+            return render(request, "dialog.html", {"neuro_text": f_res, "id": dialog.id})
         if(dialog.stage == 4):
             if(request.POST.get("text") == "Good"):
                 dialog.is_good_result = True
             else:
                 dialog.is_good_result = False
+            return render(request, "dialog.html", {"neuro_text": "Ok", "id": dialog.id})
 
 
     else:
         dialog = NewDialog.objects.create()
-        return render(request, "dialog.html", {"dialog_id": dialog.id})
+        dialog.save()
+        return render(request, "dialog.html", {"id": dialog.id})
 
