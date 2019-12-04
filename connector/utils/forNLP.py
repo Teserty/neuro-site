@@ -11,30 +11,20 @@ nltk.download('punkt')
 nltk.download('stopwords')
 
 
-def work_with_text(text, withLemmatizer = False):
-    # Convert text
+def remove_stop_words(text):
     sentences = nltk.sent_tokenize(text)
-
-    # Remove "stop-words" like "I, have, may... etc"
     stop_words = set(stopwords.words("english"))
-
-    # From array of texts
     without_stop_words = []
     for i in sentences:
         words = nltk.word_tokenize(i.lower())
         without_stop_words += [word for word in words if not word in stop_words]
-    # Lemmatize
-    if not withLemmatizer:
-        return_array = without_stop_words
-    else:
-        return_array = []
-        for word in without_stop_words:
-            return_array.append(lemmatizer.lemmatize(word, wordnet.VERB))
+    return without_stop_words
 
-    # Bag test
-    # work_with_bag(return_array)
 
-    # Return array of words
+def lemmatize(array):
+    return_array = []
+    for word in array:
+        return_array.append(lemmatizer.lemmatize(word, wordnet.VERB))
     return return_array
 
 
