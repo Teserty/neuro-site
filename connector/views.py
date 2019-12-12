@@ -4,17 +4,13 @@ import numpy as np
 from main import predict
 from connector.models import NewDialog
 from connector.data.readydata import *
-
-
-# 0 - пользователь написал нам свои жалобы
-# 1 - пользователь получил наш ответ и оценивает его
-# TODO Ввод симптомов с пробелами
+from connector.data.sparser import *
 
 
 def dialog_view(request):
     if request.method == "POST":
         dialog = NewDialog.objects.get(id=request.POST.get("id"))
-        if(dialog.stage == 0):
+        if dialog.stage == 0:
             text = request.POST.get("text")
             text = text.replace(" ,", ",")
             text = text.lower()
@@ -26,11 +22,22 @@ def dialog_view(request):
                     new_text = i
                 else:
                     new_text = new_text + " " + i
+            dialog.user_text = new_text
+            dialog.stage = 1
+            dialog.save()
+            array = make_advert_with_text(new_text)
+            print(array)
+            return render(request, "dialog.html",
+                          {"OK": "hidden", "neuro_text": "Maybe you have some of this symptoms too?", "id": dialog.id, "hidden": "",
+                           "hidden2": "hidden", "advice": array})
+        elif dialog.stage == 1:
+            text = dialog.user_text
+            also = request.POST.get("text")
             tok = np.zeros(132)
             c = 0
-            print(new_text)
+            print(text)
             for i in data:
-                if i in new_text:
+                if i in text:
                     tok[c] = 1
                 c += 1
 
@@ -42,11 +49,13 @@ def dialog_view(request):
                 mystring += str(digit)
             dialog.our_text += "\n" + mystring
             dialog.result = array
-            dialog.stage = 1
+            dialog.stage = 2
             dialog.save()
-            return render(request, "dialog.html", {"OK": "hidden", "neuro_text": "You seem to have:", "id": dialog.id, "hidden": "", "pred": array})
-        if(dialog.stage == 1):
-            if(request.POST.get("text") == "Good"):
+            return render(request, "dialog.html",
+                          {"OK": "hidden", "neuro_text": "You seem to have:", "id": dialog.id, "hidden": "",
+                           "pred": array})
+        elif dialog.stage == 2:
+            if request.POST.get("text") == "Good":
                 dialog.is_good_result = True
             else:
                 dialog.is_good_result = False
@@ -58,8 +67,3 @@ def dialog_view(request):
         dialog = NewDialog.objects.create()
         dialog.save()
         return render(request, "dialog.html", {"id": dialog.id, "hidden": "hidden", "pred": "", "OK": "hidden"})
-
-
-def dialog_test(request):
-    for i in dict:
-        print(i);
