@@ -3,6 +3,8 @@ from connector.utils.forNLP import *
 import numpy as np
 from main import predict
 from connector.models import NewDialog
+from connector.data.readydata import *
+
 
 # 0 - пользователь написал нам свои жалобы
 # 1 - пользователь получил наш ответ и оценивает его
@@ -16,31 +18,24 @@ def dialog_view(request):
             text = request.POST.get("text")
             text = text.replace(" ,", ",")
             text = text.lower()
-            without_stop_words = remove_stop_words(text)
-            #without_stop_words = lemmatize(without_stop_words)
+            array = text.split(" ")
+            array = lemmatize(array)
             new_text = ""
-            for i in without_stop_words:
-                i = i.replace(",", "")
+            for i in array:
                 if new_text == "":
                     new_text = i
                 else:
-                    if i != "":
-                        new_text = new_text + ", " + i
-            s_dict = open("data/symptoms.dict")
-            symptoms = []
-            for i in s_dict:
-                i = i.replace(" ", "")
-                i = i.replace("\n", "")
-                symptoms.append(i)
+                    new_text = new_text + " " + i
             tok = np.zeros(132)
             c = 0
-            new_text = new_text.split(", ")
-            for i in symptoms:
+            print(new_text)
+            for i in data:
                 if i in new_text:
                     tok[c] = 1
                 c += 1
-            array = predict(tok)
 
+            array = predict(tok)
+            print(array)
             dialog.user_text += "\n" + request.POST.get("text")
             mystring = ""
             for digit in array:
@@ -63,3 +58,8 @@ def dialog_view(request):
         dialog = NewDialog.objects.create()
         dialog.save()
         return render(request, "dialog.html", {"id": dialog.id, "hidden": "hidden", "pred": "", "OK": "hidden"})
+
+
+def dialog_test(request):
+    for i in dict:
+        print(i);
