@@ -1,6 +1,31 @@
 #Not for Server
 
 #Only to make data
+def new_get_symptoms_dict():
+    dict = open("../../data/Training.csv")
+    symptoms = []
+    data = []
+    for i in dict:
+        if len(symptoms) < 1:
+            s = i.split(",")
+            for y in s:
+                y = y.replace("_", " ")
+                symptoms.append(y)
+        else:
+            c = 0
+            words = i.split(",")
+            key = words[-1]
+            for word in words:
+                if word == "0" or word == "1":
+                    c += 1
+                    if word == "1":
+                        line = key.replace("\n", "") +","+symptoms[c].replace("\n", "")
+                        data.append(line)
+            #print(key)
+    data = list(set(data))
+    #print(data)
+
+    return data
 
 
 def get_symptoms_dict():
@@ -26,12 +51,12 @@ def get_symptopms():
 ####
 
 
-from connector.data.readydata import data2
+from connector.data.readydata import data3
 def make_dialog():
 
     data_symptoms_to_ills = {}
     data_ills_to_symptoms = {}
-    for i in data2:
+    for i in data3:
         i = i.replace("\n", "").lower().split(",")
         x = i[0]
         y = i[1]
@@ -58,6 +83,8 @@ def make_advert(symptoms):
     s_advice = []
     s_dict = {}
     max = 0
+    if type(ills) == None:
+        return -1
     for ill in ills:
         for s in dict_ills.get(ill):
             if s_dict.get(s):
@@ -67,8 +94,9 @@ def make_advert(symptoms):
                     max = value
             else:
                 s_dict.update({s: 1})
+    #print(s_dict)
     for i, y in s_dict.items():
-        if y == max and i not in symptoms:
+        if y > max/2 and i not in symptoms:
             s_advice.append(i)
     return s_advice
 
@@ -82,13 +110,10 @@ def make_advert_with_text(text):
     for i in ready_data:
         if i in text:
             symp.append(i)
-    print(symp)
+    #print(symp)
     return make_advert(symp)
 
-def test():
-    pass
-    #print(make_dialog())
-    #print(make_advert_with_text("Fatigue"))
 
 if __name__ == "__main__":
-    test()
+    #print(new_get_symptoms_dict())
+    print(make_advert_with_text("joint pain"))
