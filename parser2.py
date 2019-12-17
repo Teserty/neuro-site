@@ -93,6 +93,15 @@ def tokenize(val):
     return tok
 
 
+def get_symptom(index):
+    symptoms = []
+    s_dict = open("data/symptoms.dict")
+    for line in s_dict:
+        symptoms.append(line.strip("\n"))
+
+    return symptoms[index]
+
+
 def get_disease(index):
     diseases = []
     d_dict = open("data/diseases.dict")

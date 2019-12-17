@@ -1,6 +1,7 @@
 from tensorflow.python.keras import Sequential
 from tensorflow.python.keras.layers import Dense, Dropout
 
+
 def init_model(_in, _out):
     print(_in)
     print(_out)

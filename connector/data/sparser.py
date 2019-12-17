@@ -71,6 +71,8 @@ def make_dialog():
         else:
             data_ills_to_symptoms.update({x: list([y])})
     return data_symptoms_to_ills, data_ills_to_symptoms
+
+
 def make_advert(symptoms):
     dict_symptoms, dict_ills = make_dialog()
     ills = []
