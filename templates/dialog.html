@@ -27,13 +27,16 @@
                     Please send us your rating in the box above. Write "Good" if you think the diagnosis is correct or "Bad" if incorrect.
                 </div>
                 <div class="prediction my-3" {{ hidden }} {{ hidden2 }}>
-                    <p class="pred1" style="font-size: 30pt">{{ neuro_text }}</p>
-                    <br>
+                    {% if not fail_pred %}
+                        <p class="pred1" style="font-size: 30pt">{{ neuro_text }}</p>
+                        <br>
+                    {% endif %}
                     {% if pred_one %}
                         <p class="pred_one" style="font-size: 30pt; color: darkgreen">{{ pred_one}}</p>
                         <br>
                         (Unambiguously determining disease based on one symptom, according to our database)
-                    {% else %}
+                    {% endif %}
+                    {% if not fail_pred and not pred_one %}
                         <p class="pred1" style="font-size: 30pt; color: darkgreen">{{ pred.0.0 }}% - {{ pred.0.1 }}</p>
                         <br>
                         <p class="pred2" style="font-size: 20pt">{{ pred.1.0 }}% - {{ pred.1.1 }}</p>

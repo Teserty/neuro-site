@@ -98,7 +98,7 @@ def make_advert(symptoms):
                 s_dict.update({s: 1})
     #print(s_dict)
     for i, y in s_dict.items():
-        if y > max/2 and i not in symptoms:
+        if i not in symptoms:
             s_advice.append(i)
     return s_advice
 
