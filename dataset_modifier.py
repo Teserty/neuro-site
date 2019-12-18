@@ -40,9 +40,9 @@ def get_symptoms_sum_vec():
     for i in range(len(sum_vec)):
         if sum_vec[i] in range(108, 121):
             min_symptoms.append(i)
-            print("{} - {}".format(get_symptom(i), sum_vec[i]))
+            # print("{} - {}".format(get_symptom(i), sum_vec[i]))
 
-    print(min_symptoms)
+    # print(min_symptoms)
 
     return min_symptoms
 
@@ -55,11 +55,11 @@ def get_disease_by_solo_symptom(symptom_index):
         return "Sorry, there are no diseases with this symptom in our database"
 
     for i in raw_data[1:]:
-        if i[symptom_index] != 0:
+        if i[symptom_index] != "0":
             if symptom_index in min_symptoms:
                 return i[-1]
             else:
-                return "Couldn't unambiguously identify the disease, too little information"
+                return "None"
 
 
 # def reduce_synonyms_and_tokenize():
@@ -67,4 +67,10 @@ def get_disease_by_solo_symptom(symptom_index):
 if __name__ == '__main__':
     # get_max_symptom(0)
     # get_symptoms_sum_vec()
-    print(get_disease_by_solo_symptom(4))
+    _set = set()
+    data = [2, 4, 9, 10, 13, 15, 16, 17, 22, 23, 26, 29, 36, 42, 44, 46, 51, 52, 53, 54, 55, 57, 59, 60, 61, 62, 65, 66, 68, 69, 70, 71, 72, 73, 75, 76, 77, 78, 79, 83, 84, 86, 87, 88, 89, 91, 92, 93, 94, 98, 100, 102, 103, 104, 105, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131]
+    for i in data:
+        _set.add(get_disease_by_solo_symptom(i))
+        # print(get_disease_by_solo_symptom(i))
+
+    print(_set)

@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from connector.utils.forNLP import *
 import numpy as np
+
+from dataset_modifier import get_disease_by_solo_symptom
 from main import predict
 from connector.models import NewDialog
 from connector.data.readydata import *
@@ -22,6 +24,8 @@ def gleb_blyad(text):
 def dialog_view(request):
     if request.method == "POST":
         dialog = NewDialog.objects.get(id=request.POST.get("id"))
+        print( request.POST.get("text"))
+        print( dialog.stage)
         if dialog.stage == 0:
             print(0)
             text = request.POST.get("text")
@@ -44,11 +48,12 @@ def dialog_view(request):
             dialog.save()
             array = make_advert_with_text(dialog.user_text)
             print(array)
+            arr_text = ", ".join(array)
             return render(request, "dialog.html",
                           {"OK": "hidden", "neuro_text": "Maybe you have some of this symptoms too? Please."
                                                          " Write 'end' or 'finish', if you finish", "id": dialog.id,
                            "hidden": "",
-                           "hidden2": "hidden", "advice": array})
+                           "hidden2": "hidden", "advice": arr_text})
         elif dialog.stage == 1:
             print(1)
             text = dialog.user_text
@@ -56,11 +61,32 @@ def dialog_view(request):
             text = text + " " + also
             tok = np.zeros(132)
             c = 0
+            cnt = 0
+            index = 0
             for i in data:
                 if i in text:
                     tok[c] = 1
+                    cnt += 1
+                    index = c
                 c += 1
-            if 1 in tok:
+            if cnt == 1:
+                disease = get_disease_by_solo_symptom(index)
+                print(disease)
+                dialog.user_text += "\n" + request.POST.get("text")
+                dialog.our_text += "\n" + disease
+                dialog.result = disease
+                dialog.stage = 2
+                dialog.save()
+                if disease == "None":
+                    disease = "Couldn't unambiguously identify the disease, too little information"
+                    return render(request, "dialog.html",
+                              {"OK": "hidden", "neuro_text": "You seem to have:", "id": dialog.id, "hidden": "",
+                               "fail_pred":disease})
+                else:
+                    return render(request, "dialog.html",
+                              {"OK": "hidden", "neuro_text": "You seem to have:", "id": dialog.id, "hidden": "",
+                               "pred_one": disease})
+            elif cnt > 1:
                 array = predict(tok)
                 print(array)
                 dialog.user_text += "\n" + request.POST.get("text")
@@ -75,17 +101,18 @@ def dialog_view(request):
                               {"OK": "hidden", "neuro_text": "You seem to have:", "id": dialog.id, "hidden": "",
                                "pred": array})
             else:
-                #TODO Реализовать страничку или выписать в существующую страничку когда
-                # пользоваетль не ввел симптомы или мы их не нашли
-                pass
-
+                dialog.stage = 0
+                dialog.save()
+                return render(request, "dialog.html", {"id": dialog.id, "hidden": "hidden", "pred": "", "OK": "hidden",
+                                                       "hidden2": "hidden"})
         elif dialog.stage == 2:
             if request.POST.get("text") == "Good":
                 dialog.is_good_result = True
             else:
                 dialog.is_good_result = False
             dialog.save()
-            return render(request, "dialog.html", {"OK": "", "id": dialog.id, "hidden": "hidden", "pred": ""})
+            return redirect("dialog")
+            # return render(request, "dialog.html", {"OK": "", "id": dialog.id, "hidden": "hidden", "pred": ""})
     else:
         dialog = NewDialog.objects.create()
         dialog.save()

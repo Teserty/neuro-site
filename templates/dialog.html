@@ -19,22 +19,37 @@
                     <div class="" style="height: 100px;"></div>
                     <div class="form-group">
                         <label for="exampleFormControlTextarea1" style="font-size: 20pt">What is bothering you?</label>
-                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="text"></textarea
+                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="text"></textarea>
                     </div>
                     <button type="submit" class="btn btn-success my-3" style="font-size: 14pt">View my diagnosis</button>
                 </form>
-                <div {{ hidden }}>
+                <div {{ hidden2 }} {{ hidden }} style="font-size: 18pt">
                     Please send us your rating in the box above. Write "Good" if you think the diagnosis is correct or "Bad" if incorrect.
                 </div>
                 <div class="prediction my-3" {{ hidden }} {{ hidden2 }}>
                     <p class="pred1" style="font-size: 30pt">{{ neuro_text }}</p>
                     <br>
-                    <p class="pred1" style="font-size: 30pt; color: darkgreen">{{ pred.0.0 }}% - {{ pred.0.1 }}</p>
-                    <br>
-                    <p class="pred2" style="font-size: 20pt">{{ pred.1.0 }}% - {{ pred.1.1 }}</p>
-                    <p class="pred3" style="font-size: 20pt">{{ pred.2.0 }}% - {{ pred.2.1 }}</p>
+                    {% if pred_one %}
+                        <p class="pred_one" style="font-size: 30pt; color: darkgreen">{{ pred_one}}</p>
+                        <br>
+                        (Unambiguously determining disease based on one symptom, according to our database)
+                    {% else %}
+                        <p class="pred1" style="font-size: 30pt; color: darkgreen">{{ pred.0.0 }}% - {{ pred.0.1 }}</p>
+                        <br>
+                        <p class="pred2" style="font-size: 20pt">{{ pred.1.0 }}% - {{ pred.1.1 }}</p>
+                        <p class="pred3" style="font-size: 20pt">{{ pred.2.0 }}% - {{ pred.2.1 }}</p>
+                    {% endif %}
                 </div>
-                {{ advice }}
+                <div class="advice" style="font-size: 20pt">
+                    {% if advice %}
+                        Do you have any of these symptoms?<br>
+                        Write "End" or "Finish" when you're ready to see the diagnosis<br><br>
+                        <p class="pred1" style="font-size: 18pt; color: darkgreen">{{ advice }}</p>
+                    {% endif %}
+                    {% if fail_pred %}
+                        {{ fail_pred }}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

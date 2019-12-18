@@ -38,10 +38,10 @@ def create_dict():
         d_dict.write("{}\n".format(i))
 
     symptom_set = np.array(list(symptom_set))
-    s_dict = open("data/symptoms.dict", "w")
+    s_dict = open("connector/data/symptoms.dict", "w")
     for i in symptom_set:
         s = i.lower()
-        s = s.replace('_', '')
+        s = s.replace('_', ' ')
         s_dict.write("{}\n".format(s))
 
     d_dict.close()
@@ -113,4 +113,4 @@ def get_disease(index):
 
 if __name__ == '__main__':
     create_dict()
-    print(get_clean_data())
+    # print(get_clean_data())
